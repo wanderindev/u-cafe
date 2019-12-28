@@ -36,22 +36,40 @@ class Drink(db.Model):
     # [{'color': string, 'name':string, 'parts':number}]
     recipe = Column(String(180), nullable=False)
 
-    def short(self):
-        """Short form representation of the Drink model."""
-        print(json.loads(self.recipe))
-        short_recipe = [
-            {"color": r["color"], "parts": r["parts"]}
-            for r in json.loads(self.recipe)
-        ]
-        return {"id": self.id, "title": self.title, "recipe": short_recipe}
+    def delete(self):
+        """Delete a recipe from the database"""
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            print(e)
+            print(sys.exc_info())
+            db.session.rollback()
+            return {"error": True}
+        finally:
+            db.session.close()
 
-    def long(self):
-        """Long form representation of the Drink model."""
-        return {
-            "id": self.id,
-            "title": self.title,
-            "recipe": json.loads(self.recipe),
-        }
+    @classmethod
+    def get_all(cls):
+        """
+        Return all drinks records ordered by id.
+
+        :return: a list of Drink objects
+        :type: list
+        """
+        return cls.query.order_by(cls.id).all()
+
+    @classmethod
+    def get_by_id(cls, _id):
+        """
+        Return the drink with the given id.
+
+        :param _id: the drink id
+        :type _id: int
+        :return: a Drink object
+        :type: Drink
+        """
+        return cls.query.filter(cls.id == _id).one_or_none()
 
     def insert(self):
         """Insert a new recipe into a database."""
@@ -66,18 +84,32 @@ class Drink(db.Model):
         finally:
             db.session.close()
 
-    def delete(self):
-        """Delete a recipe from the database"""
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except exc.SQLAlchemyError as e:
-            print(e)
-            print(sys.exc_info())
-            db.session.rollback()
-            return {"error": True}
-        finally:
-            db.session.close()
+    def long(self):
+        """
+        Return a long form representation of a drink.
+
+        :return: a drink representation
+        :type: dict
+        """
+        return {
+            "id": self.id,
+            "title": self.title,
+            "recipe": json.loads(self.recipe),
+        }
+
+    def short(self):
+        """
+        Return a short form representation of a drink.
+
+        :return: a drink representation
+        :type: dict
+        """
+        print(json.loads(self.recipe))
+        short_recipe = [
+            {"color": r["color"], "parts": r["parts"]}
+            for r in json.loads(self.recipe)
+        ]
+        return {"id": self.id, "title": self.title, "recipe": short_recipe}
 
     @staticmethod
     def update():
