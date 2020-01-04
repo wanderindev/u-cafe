@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, abort
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
-from .auth.auth import AuthError, requires_auth
+from database.models import db_drop_and_create_all, setup_db, Drink
+from auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
@@ -174,8 +174,11 @@ def auth_error(error):
             {
                 "success": False,
                 "error": error.status_code,
-                "message": error.error.description,
+                "message": error.error,
             }
         ),
-        AuthError,
+        error.status_code,
     )
+
+if __name__ == "__main__":
+     app.run(debug=True)
