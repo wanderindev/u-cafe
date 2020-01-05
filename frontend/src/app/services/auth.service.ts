@@ -4,6 +4,7 @@ import {JwtHelperService} from '@auth0/angular-jwt';
 import {environment} from '../../environments/environment';
 
 const JWTS_LOCAL_KEY = 'JWTS_LOCAL_KEY';
+// noinspection JSUnusedLocalSymbols
 const JWTS_ACTIVE_INDEX_KEY = 'JWTS_ACTIVE_INDEX_KEY';
 
 @Injectable({
@@ -76,6 +77,7 @@ export class AuthService {
     }
 
     can(permission: string) {
+        // tslint:disable-next-line:max-line-length
         return this.payload && this.payload.permissions && this.payload.permissions.length && this.payload.permissions.indexOf(permission) >= 0;
     }
 }

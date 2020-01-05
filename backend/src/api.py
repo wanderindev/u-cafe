@@ -24,15 +24,16 @@ def get_drinks():
 
     return (
         jsonify(
-            {"drink": [drink.short() for drink in drinks], "success": True}
+            {"drinks": [drink.short() for drink in drinks], "success": True}
         ),
         200,
     )
 
 
+# noinspection PyUnusedLocal
 @app.route("/drinks-detail", methods=["GET"])
 @requires_auth("get:drinks-detail")
-def get_drinks_detail():
+def get_drinks_detail(payload):
     drinks = Drink.get_all()
 
     if len(drinks) == 0:
@@ -40,15 +41,16 @@ def get_drinks_detail():
 
     return (
         jsonify(
-            {"drink": [drink.long() for drink in drinks], "success": True}
+            {"drinks": [drink.long() for drink in drinks], "success": True}
         ),
         200,
     )
 
 
+# noinspection PyUnusedLocal
 @app.route("/drinks", methods=["POST"])
 @requires_auth("post:drinks")
-def create_drink():
+def create_drink(payload):
     data = request.get_json()
     drink = Drink(**data)
     result = drink.insert()
@@ -59,19 +61,15 @@ def create_drink():
     _id = result["id"]
 
     return (
-        jsonify(
-            {
-                "drink": [drink.long() for drink in Drink.get_by_id(_id)],
-                "success": True,
-            }
-        ),
+        jsonify({"drinks": [Drink.get_by_id(_id).long()], "success": True,}),
         200,
     )
 
 
+# noinspection PyUnusedLocal
 @app.route("/drinks/<int:drink_id>", methods=["PATCH"])
 @requires_auth("patch:drinks")
-def update_drink(drink_id):
+def update_drink(payload, drink_id):
     drink = Drink.get_by_id(drink_id)
 
     if drink is None:
@@ -93,18 +91,16 @@ def update_drink(drink_id):
 
     return (
         jsonify(
-            {
-                "drink": [drink.long() for drink in Drink.get_by_id(drink_id)],
-                "success": True,
-            }
+            {"drinks": [Drink.get_by_id(drink_id).long()], "success": True,}
         ),
         200,
     )
 
 
+# noinspection PyUnusedLocal
 @app.route("/drinks/<int:drink_id>", methods=["DELETE"])
 @requires_auth("delete:drinks")
-def delete_drink(drink_id):
+def delete_drink(payload, drink_id):
     drink = Drink.get_by_id(drink_id)
 
     if drink is None:
@@ -115,21 +111,14 @@ def delete_drink(drink_id):
     if result["error"]:
         abort(500)
 
-    return jsonify(
-        {
-            "delete": drink_id,
-            "success": True,
-        }
-    )
+    return jsonify({"delete": drink_id, "success": True,})
 
 
 # noinspection PyUnusedLocal
 @app.errorhandler(400)
 def not_found(error):
     return (
-        jsonify(
-            {"success": False, "error": 400, "message": "Bad request"}
-        ),
+        jsonify({"success": False, "error": 400, "message": "Bad request"}),
         400,
     )
 
@@ -180,5 +169,6 @@ def auth_error(error):
         error.status_code,
     )
 
+
 if __name__ == "__main__":
-     app.run(debug=True)
+    app.run(debug=True)
