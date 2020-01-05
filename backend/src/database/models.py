@@ -36,7 +36,8 @@ class Drink(db.Model):
     # [{'color': string, 'name':string, 'parts':number}]
     recipe = Column(String(180), nullable=False)
 
-    def __init__(self, title, recipe):
+    # noinspection PyUnusedLocal
+    def __init__(self, title, recipe, id=None):
         self.title = title
         self.recipe = json.dumps(recipe)
 
