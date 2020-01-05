@@ -7,11 +7,12 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = "dev-u-cafe.auth0.com"
 ALGORITHMS = ["RS256"]
-API_AUDIENCE = "dev"
+API_AUDIENCE = "u-cafe"
 
 
 class AuthError(Exception):
     """A standardized way to communicate auth failure modes"""
+
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
@@ -51,7 +52,6 @@ def get_token_auth_header():
             401,
         )
     token = parts[1]
-
     return token
 
 
@@ -77,7 +77,7 @@ def check_permissions(permission, payload):
     if permission not in payload["permissions"]:
         raise AuthError(
             {"code": "unauthorized", "description": "Permission not found."},
-            403,
+            401,
         )
 
     return True
@@ -134,7 +134,7 @@ def verify_decode_jwt(token):
             raise AuthError(
                 {
                     "code": "invalid_claims",
-                    "description": "wrong claims.Please, check the audience",
+                    "description": "Wrong claims.Please, check the audience",
                 },
                 401,
             )

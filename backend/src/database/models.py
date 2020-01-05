@@ -36,11 +36,16 @@ class Drink(db.Model):
     # [{'color': string, 'name':string, 'parts':number}]
     recipe = Column(String(180), nullable=False)
 
+    def __init__(self, title, recipe):
+        self.title = title
+        self.recipe = json.dumps(recipe)
+
     def delete(self):
         """Delete a recipe from the database"""
         try:
             db.session.delete(self)
             db.session.commit()
+            return {"error": False}
         except exc.SQLAlchemyError as e:
             print(e)
             print(sys.exc_info())
@@ -76,6 +81,7 @@ class Drink(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
+            return {"error": False, "id": self.id}
         except exc.SQLAlchemyError as e:
             print(e)
             print(sys.exc_info())
@@ -104,7 +110,6 @@ class Drink(db.Model):
         :return: a drink representation
         :type: dict
         """
-        print(json.loads(self.recipe))
         short_recipe = [
             {"color": r["color"], "parts": r["parts"]}
             for r in json.loads(self.recipe)
@@ -116,6 +121,7 @@ class Drink(db.Model):
         """Update a recipe in the database"""
         try:
             db.session.commit()
+            return {"error": False}
         except exc.SQLAlchemyError as e:
             print(e)
             print(sys.exc_info())
