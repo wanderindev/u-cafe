@@ -143,7 +143,7 @@ def unprocessable(error):  # pragma: no cover
 
 # noinspection PyUnusedLocal
 @app.errorhandler(500)
-def unprocessable(error):
+def internal_error(error):
     return (
         jsonify(
             {
